@@ -1,5 +1,4 @@
-// /src/components/DraggableItem.jsx (最終穩定版)
-
+// /src/components/DraggableItem.jsx (穩定版)
 import { useRef, useState, useCallback, useEffect } from 'react';
 import { useThree } from '@react-three/fiber';
 import { RigidBody } from '@react-three/rapier';

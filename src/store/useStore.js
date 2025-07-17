@@ -1,3 +1,4 @@
+// /src/store/useStore.js (穩定版)
 import create from 'zustand';
 
 const useStore = create((set, get) => ({
