@@ -1,4 +1,4 @@
-// /src/components/StorageSpace.jsx (最終修正版 - 補上 import)
+// /src/components/StorageSpace.jsx (最終正確版 - 補上 import)
 
 import { RigidBody } from '@react-three/rapier';
 import { Box, Edges } from '@react-three/drei';
