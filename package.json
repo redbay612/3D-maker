@@ -7,17 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "
-
----
-
-### **提供完整檔案抽換（基於您現有版本）**
-
-我們將使用經過我最終驗證的、最穩定的程式碼，來**徹底覆蓋**您專案中所有相關的核心檔案。這不是小修補，而是一次**全面的、乾淨的抽換**。
-
-#### **✅ 檔案 1: `/src/store/useStore.js` (最終穩定版)**
-
-**請用以下完整preview": "vite preview",
+    "preview": "vite preview",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"
   },
@@ -31,15 +21,7 @@
     "zustand": "^4.3.9"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.程式碼，覆蓋掉您原本的 `/src/store/useStore.js` 檔案：**
-```javascript
-import create from 'zustand';
-
-const useStore = create((set, get) => ({
-  items: [
-    { id: 's-box', name: '小紙箱', dimensions: { w: 0.35, h: 0.25, d: 0.30 } },
-    { id: 'm-box', name: '中紙箱', dimensions: { w: 0.48, h: 0.32, d: 0.36 } },
-    { id: 'l-0.0",
+    "@vitejs/plugin-react": "^4.0.0",
     "autoprefixer": "^10.4.14",
     "gh-pages": "^5.0.0",
     "postcss": "^8.4.24",
