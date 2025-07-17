@@ -1,40 +1,19 @@
+// /src/components/StorageSpace.jsx (最終修正版 - 清理語法錯誤)
+
 import { RigidBody } from '@react-three/rapier';
 import { Box, Edges } from '@react-three/drei';
 import useStore from '../store/useStore';
 
 export default function StorageSpace() {
-  const from '@react-three/rapier';
-import DraggableItem from './DraggableItem';
-import StorageSpace from './StorageSpace';
-import useStore from '../store/useStore';
-import { useRef } from 'react';
+    const { storageSpaces, selectedSpace } = useStore();
+    const dims = storageSpaces[selectedSpace];
 
-export default function Scene() {
-  const itemsInScene = useStore((state) => state.itemsInScene);
-  const orbitControlsRef = useRef();
-
-  return (
-    <Canvas camera={{ position: [8, 8, 8], fov: 50 }} shadows>
-      <ambientLight intensity={0.7} />
-      <directionalLight position={[5, 10, 7.5]} intensity={1.0} castShadow />
-      <OrbitControls ref={orbitControlsRef} makeDefault />
-      <Grid infiniteGrid={true} fadeDistance={50} fadeStrength={5} />
-      <Physics gravity={[0, -9.8, 0]}>
+    return (
         <RigidBody type="fixed" colliders="cuboid">
-          <mesh position={[0, -0.05, 0]} userData={{ isGround: true }}>
-            <boxGeometry args={[200, 0.1, 200]} />
-            <meshStandardMaterial transparent opacity={0} />
-          </mesh>
+            <Box position={[0, dims.h / 2, 0]} args={[dims.w, dims.h, dims.d]}>
+                <meshBasicMaterial transparent opacity={0.05} color="white" />
+                <Edges color="white" lineWidth={2} />
+            </Box>
         </RigidBody>
-        <StorageSpace />
-        {itemsInScene.map((item) => (
-          <DraggableItem 
-            key={item.instanceId} 
-            item={item} 
-            orbitControlsRef={orbitControlsRef}
-          />
-        ))}
-      </Physics>
-    </Canvas>
-  );
+    );
 }
