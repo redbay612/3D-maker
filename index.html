@@ -7,22 +7,6 @@
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src.9, h: 2.4, d: 1.9 }, 'Custom': { w: 2, h: 2.5, d: 2 },
-  },
-  selectedSpace: '200材',
-  itemsInScene: [],
-
-  setStorageSpace: (size) => set({ selectedSpace: size, itemsInScene: [] }),
-  setCustomSpace: (dims) => set((state) => ({ storageSpaces: { ...state.storageSpaces, Custom: dims }, selectedSpace: 'Custom', itemsInScene: [] })),
-  addItemToScene: (item, quantity = 1) => { /* 函數內容省略 */ },
-  removeItemFromScene: (instanceId) => set((state) => ({ itemsInScene: state.itemsInScene.filter((item) => item.instanceId !== instanceId) })),
-  clearAllItems: () => set({ itemsInScene: [] }),
-  getCalculations: () => { /* 函數內容省略 */ },
-}));
-
-useStore.setState({
-  addItemToScene: (item, quantity = 1) => {
-    const { storageSpaces, selectedSpace } = useStore.getState();
-    const spaceDims = storage="/src/main.jsx"></script>
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
