@@ -1,18 +1,19 @@
-// src/components/StorageSpace.jsx
+// /src/components/StorageSpace.jsx (最終修正版 - 清理語法錯誤)
 
-// 1. 將所有 import 語句移至檔案頂部
-import { useRapier } from '@react-three/rapier'; // 2. 使用正確的 import 語法
-import DraggableItem from './DraggableItem';
-// 註：通常不需要在一個檔案中匯入自己，若非特殊用途，下面這行可以刪除
-// import StorageSpace from './StorageSpace'; 
+import { RigidBody } from '@react-three/rapier';
+import { Box, Edges } from '@react-three/drei';
+import useStore from '../store/useStore';
 
 export default function StorageSpace() {
-  // 假設您需要使用 useRapier 這個 hook
-  const { rapier, world } = useRapier();
+    const { storageSpaces, selectedSpace } = useStore();
+    const dims = storageSpaces[selectedSpace];
 
-  // ...組件的其他邏輯...
-
-  return (
-    // ...JSX 內容...
-  );
+    return (
+        <RigidBody type="fixed" colliders="cuboid">
+            <Box position={[0, dims.h / 2, 0]} args={[dims.w, dims.h, dims.d]}>
+                <meshBasicMaterial transparent opacity={0.05} color="white" />
+                <Edges color="white" lineWidth={2} />
+            </Box>
+        </RigidBody>
+    );
 }
