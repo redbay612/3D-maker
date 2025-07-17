@@ -1,20 +1,20 @@
-// /src/App.jsx (³Ì²×¸ô®|­×¥¿ª©)
+// /src/App.jsx (æœ€çµ‚ç©©å®šç‰ˆ)
 
-import { Canvas } from '@react-three/fiber';
 import Scene from './components/Scene';
 import ControlPanel from './components/ControlPanel';
 import InfoPanel from './components/InfoPanel';
 
 function App() {
-    return (
-        <div className="w-screen h-screen bg-gray-900 relative">
-            <ControlPanel />
-            <InfoPanel />
-            ¦nªº¡A¦¬¨ì±z´£¨Ñªº³Ì·s¿ù»~ºI¹Ï¡C§Ú±NÄY®æ¿í´`±z©Ò½T¥ßªº±M·~<div className="w-full h-full">
-                <Scene />
-            </div>
-        </div>
-    );
+  return (
+    <div className="w-screen h-screen bg-gray-900 relative">
+      {/* æ¢å¾©åˆ°æœ€ç°¡å–®çš„çµæ§‹ï¼Œç¢ºä¿æ‰€æœ‰å…ƒä»¶éƒ½è¢«æ¸²æŸ“ */}
+      <ControlPanel />
+      <InfoPanel />
+      <div className="w-full h-full">
+        <Scene />
+      </div>
+    </div>
+  )
 }
 
 export default App;
