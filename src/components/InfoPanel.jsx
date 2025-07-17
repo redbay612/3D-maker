@@ -1,4 +1,4 @@
-// /src/components/InfoPanel.jsx (最終修正版 - 修正 useState 語法)
+// /src/components/InfoPanel.jsx (最終版)
 
 import { useState, useEffect } from 'react';
 import useStore from '../store/useStore';
@@ -11,9 +11,7 @@ export default function InfoPanel({ isOpen, onClose }) {
   } = useStore();
   
   const { spaceVolume, itemsVolume, itemsCFT, usage } = getCalculations();
-  // VVVVVV 核心修改：將花括號 {} 改為方括號 [] VVVVVV
   const [customDims, setCustomDims] = useState({ w: 200, h: 250, d: 200 });
-  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
   useEffect(() => {
     const currentDims = storageSpaces[selectedSpace];
@@ -30,10 +28,16 @@ export default function InfoPanel({ isOpen, onClose }) {
   
   const handleApplyCustomSpace = (e) => {
     e.preventDefault();
-    const newDims = { w: parseFloat(customDims.w) / 100, h: parseFloat(customDims.h) / 100, d: parseFloat(customDims.d) / 100 };
+    const newDims = { 
+      w: parseFloat(customDims.w) / 100, 
+      h: parseFloat(customDims.h) / 100, 
+      d: parseFloat(customDims.d) / 100 
+    };
     if (newDims.w > 0 && newDims.h > 0 && newDims.d > 0) {
       setCustomSpace(newDims);
-    } else { alert("請輸入所有有效的空間尺寸！"); }
+    } else {
+      alert("請輸入所有有效的空間尺寸！");
+    }
   };
 
   return (

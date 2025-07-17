@@ -1,33 +1,10 @@
-// /src/components/Scene.jsx (穩定版)
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Grid } from '@react-three/drei';
-import { Physics, CuboidCollider } from '@react-three/rapier';
-import DraggableItem from './DraggableItem';
-import StorageSpace from './StorageSpace';
-import useStore from '../store/useStore';
-import { useRef } from 'react';
-
-export default function Scene() {
-  const itemsInScene = useStore((state) => state.itemsInScene);
-  const orbitControlsRef = useRef();
-
-  return (
-    <Canvas camera={{ position: [8, 8, 8], fov: 50 }} shadows>
-      <ambientLight intensity={0.7} />
-      <directionalLight position={[5, 10, 7.5]} intensity={1.0} castShadow />
-      <OrbitControls ref={orbitControlsRef} makeDefault />
-      <Grid infiniteGrid={true} fadeDistance={50} fadeStrength={5} />
-      <Physics gravity={[0, -9.8, 0]}>
-        <CuboidCollider args={[100, 0.1, 100]} position={[0, -0.1, 0]} />
-        <StorageSpace />
-        {itemsInScene.map((item) => (
-          <DraggableItem 
-            key={item.instanceId} 
-            item={item} 
-            orbitControlsRef={orbitControlsRef}
-          />
-        ))}
-      </Physics>
-    </Canvas>
-  );
+import { Physics, RigidBody, CuboidCollider }" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+        </button>
+      </div>
+    </div>
+  )
 }
+
+export default App;
