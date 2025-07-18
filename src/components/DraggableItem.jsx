@@ -1,4 +1,4 @@
-// /src/components/DraggableItem.jsx (恢復到 初始值0718-1)
+// /src/components/DraggableItem.jsx (恢复到 初始值0718-1)
 
 import { useRef, useState, useCallback, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
