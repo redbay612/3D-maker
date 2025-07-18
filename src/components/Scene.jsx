@@ -1,6 +1,6 @@
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Grid } from '@react-three/drei';
-import { Physics, RigidBody, CuboidCollider } from '@react-three/rapier';
+import { Physics, RigidBody } from '@react-three/rapier';
 import DraggableItem from './DraggableItem';
 import StorageSpace from './StorageSpace';
 import useStore from '../store/useStore';
@@ -18,7 +18,7 @@ export default function Scene() {
             <Grid infiniteGrid={true} fadeDistance={50} fadeStrength={5} />
             <Physics gravity={[0, -9.8, 0]}>
                 <RigidBody type="fixed" colliders="cuboid">
-                    <mesh position={[0, -0.05, 0]} userData={{ isGround: true }}>
+                    <mesh position={[0, -0.05, 0]} userData={{ isStackable: true }}>
                         <boxGeometry args={[200, 0.1, 200]} />
                         <meshStandardMaterial transparent opacity={0} />
                     </mesh>

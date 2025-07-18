@@ -1,9 +1,6 @@
-// /src/store/useStore.js (智慧堆疊演算法版)
-
 import create from 'zustand';
 import * as THREE from 'three';
 
-// 3D 碰撞偵測邏輯
 const checkCollision = (box1, box2) => {
     return box1.min.x < box2.max.x && box1.max.x > box2.min.x &&
         box1.min.y < box2.max.y && box1.max.y > box2.min.y &&
@@ -11,7 +8,6 @@ const checkCollision = (box1, box2) => {
 };
 
 const useStore = create((set, get) => ({
-    // 物品和空間列表保持與 `初始值0718` 一致
     items: [
         { id: 's-box', name: '小紙箱', dimensions: { w: 0.35, h: 0.25, d: 0.30 } },
         { id: 'm-box', name: '中紙箱', dimensions: { w: 0.48, h: 0.32, d: 0.36 } },
@@ -21,19 +17,15 @@ const useStore = create((set, get) => ({
         { id: 'fridge', name: '小冰箱', dimensions: { w: 0.6, h: 1.0, d: 0.6 } },
     ],
     storageSpaces: {
-        '100材': { w: 1.1, h: 2.4, d: 1.1 },
-        '200材': { w: 1.5, h: 2.4, d: 1.5 },
-        '300材': { w: 1.9, h: 2.4, d: 1.9 },
-        'Custom': { w: 2, h: 2.5, d: 2 },
+        '100材': { w: 1.1, h: 2.4, d: 1.1 }, '200材': { w: 1.5, h: 2.4, d: 1.5 },
+        '300材': { w: 1.9, h: 2.4, d: 1.9 }, 'Custom': { w: 2, h: 2.5, d: 2 },
     },
     selectedSpace: '200材',
     itemsInScene: [],
 
-    // --- Actions ---
     setStorageSpace: (size) => set({ selectedSpace: size, itemsInScene: [] }),
     setCustomSpace: (dims) => set((state) => ({ storageSpaces: { ...state.storageSpaces, Custom: dims }, selectedSpace: 'Custom', itemsInScene: [] })),
 
-    // VVVVVV 核心修改：重寫 addItemToScene 為智慧堆疊演算法 VVVVVV
     addItemToScene: (item, quantity = 1) => {
         for (let i = 0; i < quantity; i++) {
             const { itemsInScene, storageSpaces, selectedSpace } = get();
@@ -46,7 +38,7 @@ const useStore = create((set, get) => ({
             }
 
             let bestPosition = null;
-            const step = 0.05; // 演算法的搜尋精細度
+            const step = 0.05;
 
             const existingBoxes = itemsInScene.map(it => {
                 const pos = new THREE.Vector3().fromArray(it.position);
@@ -54,16 +46,12 @@ const useStore = create((set, get) => ({
                 return new THREE.Box3().setFromCenterAndSize(pos, new THREE.Vector3(dim.w, dim.h, dim.d));
             });
 
-            const potentialSurfaces = [
-                { y: 0, minX: -spaceDims.w / 2, maxX: spaceDims.w / 2, minZ: -spaceDims.d / 2, maxZ: spaceDims.d / 2 }
-            ];
+            const potentialSurfaces = [{ y: 0, minX: -spaceDims.w / 2, maxX: spaceDims.w / 2, minZ: -spaceDims.d / 2, maxZ: spaceDims.d / 2 }];
             itemsInScene.forEach(existingItem => {
                 potentialSurfaces.push({
                     y: existingItem.position[1] + existingItem.dimensions.h / 2,
-                    minX: existingItem.position[0] - existingItem.dimensions.w / 2,
-                    maxX: existingItem.position[0] + existingItem.dimensions.w / 2,
-                    minZ: existingItem.position[2] - existingItem.dimensions.d / 2,
-                    maxZ: existingItem.position[2] + existingItem.dimensions.d / 2,
+                    minX: existingItem.position[0] - existingItem.dimensions.w / 2, maxX: existingItem.position[0] + existingItem.dimensions.w / 2,
+                    minZ: existingItem.position[2] - existingItem.dimensions.d / 2, maxZ: existingItem.position[2] + existingItem.dimensions.d / 2,
                 });
             });
 
@@ -108,14 +96,30 @@ const useStore = create((set, get) => ({
             }
         }
     },
-    // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
     removeItemFromScene: (instanceId) => set((state) => ({ itemsInScene: state.itemsInScene.filter((item) => item.instanceId !== instanceId) })),
     clearAllItems: () => set({ itemsInScene: [] }),
-    getCalculations: () => { /* 保持不變 */ },
+    getCalculations: () => { /* 函數內容省略 */ },
 }));
 
-// 確保 getCalculations 不會被覆蓋
-useStore.setState({ getCalculations: useStore.getState().getCalculations });
+useStore.setState({
+    getCalculations: () => {
+        const { storageSpaces, selectedSpace, itemsInScene } = useStore.getState();
+        const spaceDims = storageSpaces[selectedSpace];
+        const spaceVolume = spaceDims.w * spaceDims.h * spaceDims.d;
+        let itemsVolume = 0; let itemsCFT = 0;
+        itemsInScene.forEach(item => {
+            const w_m = item.dimensions.w; const h_m = item.dimensions.h; const d_m = item.dimensions.d;
+            itemsVolume += w_m * h_m * d_m;
+            const cft = (w_m * 100 * h_m * 100 * d_m * 100) / 28316.846592;
+            itemsCFT += cft;
+        });
+        const usage = spaceVolume > 0 ? (itemsVolume / spaceVolume) * 100 : 0;
+        return {
+            spaceVolume: spaceVolume.toFixed(2), itemsVolume: itemsVolume.toFixed(2),
+            itemsCFT: Math.round(itemsCFT), usage: Math.min(100, usage).toFixed(1),
+        };
+    }
+});
 
 export default useStore;
