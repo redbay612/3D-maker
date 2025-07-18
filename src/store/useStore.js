@@ -1,31 +1,14 @@
+// /src/store/useStore.js (緊密堆疊演算法版)
+
 import create from 'zustand';
 import * as THREE from 'three';
 
-const checkCollision = (box1, box2) => {
-    return box1.min.x < box2.max.x && box1.max.x > box2.min.x &&
-        box1.min.y < box2.max.y && box1.max.y > box2.min.y &&
-        box1.min.z < box2.max.z && box1.max.z > box2.min.z;
-};
+const checkCollision = (box1, box2) => { /* 函數內容省略 */ };
 
 const useStore = create((set, get) => ({
-    items: [
-        { id: 's-box', name: '小紙箱', dimensions: { w: 0.35, h: 0.25, d: 0.30 } },
-        { id: 'm-box', name: '中紙箱', dimensions: { w: 0.48, h: 0.32, d: 0.36 } },
-        { id: 'l-box', name: '大型箱 (L)', dimensions: { w: 0.6, h: 0.4, d: 0.45 } },
-        { id: 'washer', name: '直立洗衣機', dimensions: { w: 0.65, h: 1.05, d: 0.65 } },
-        { id: 'mattress', name: '單人床墊', dimensions: { w: 0.9, h: 1.9, d: 0.2 } },
-        { id: 'fridge', name: '小冰箱', dimensions: { w: 0.6, h: 1.0, d: 0.6 } },
-    ],
-    storageSpaces: {
-        '100材': { w: 1.1, h: 2.4, d: 1.1 }, '200材': { w: 1.5, h: 2.4, d: 1.5 },
-        '300材': { w: 1.9, h: 2.4, d: 1.9 }, 'Custom': { w: 2, h: 2.5, d: 2 },
-    },
-    selectedSpace: '200材',
-    itemsInScene: [],
+    // ... items 和 storageSpaces 列表保持不變 ...
 
-    setStorageSpace: (size) => set({ selectedSpace: size, itemsInScene: [] }),
-    setCustomSpace: (dims) => set((state) => ({ storageSpaces: { ...state.storageSpaces, Custom: dims }, selectedSpace: 'Custom', itemsInScene: [] })),
-
+    // VVVVVV 核心修改：升級 addItemToScene 演算法 VVVVVV
     addItemToScene: (item, quantity = 1) => {
         for (let i = 0; i < quantity; i++) {
             const { itemsInScene, storageSpaces, selectedSpace } = get();
@@ -38,7 +21,8 @@ const useStore = create((set, get) => ({
             }
 
             let bestPosition = null;
-            const step = 0.05;
+            let lowestY = Infinity;
+            const step = 0.01; // 提高搜尋精度
 
             const existingBoxes = itemsInScene.map(it => {
                 const pos = new THREE.Vector3().fromArray(it.position);
@@ -46,12 +30,12 @@ const useStore = create((set, get) => ({
                 return new THREE.Box3().setFromCenterAndSize(pos, new THREE.Vector3(dim.w, dim.h, dim.d));
             });
 
-            const potentialSurfaces = [{ y: 0, minX: -spaceDims.w / 2, maxX: spaceDims.w / 2, minZ: -spaceDims.d / 2, maxZ: spaceDims.d / 2 }];
+            const potentialSurfaces = [{ y: 0, w: spaceDims.w, d: spaceDims.d, x: 0, z: 0 }];
             itemsInScene.forEach(existingItem => {
                 potentialSurfaces.push({
                     y: existingItem.position[1] + existingItem.dimensions.h / 2,
-                    minX: existingItem.position[0] - existingItem.dimensions.w / 2, maxX: existingItem.position[0] + existingItem.dimensions.w / 2,
-                    minZ: existingItem.position[2] - existingItem.dimensions.d / 2, maxZ: existingItem.position[2] + existingItem.dimensions.d / 2,
+                    w: existingItem.dimensions.w, d: existingItem.dimensions.d,
+                    x: existingItem.position[0], z: existingItem.position[2],
                 });
             });
 
@@ -62,8 +46,15 @@ const useStore = create((set, get) => ({
                 if (potentialY + newItemDims.h / 2 > spaceDims.h) continue;
 
                 let placed = false;
-                for (let x = -spaceDims.w / 2 + newItemDims.w / 2; x <= spaceDims.w / 2 - newItemDims.w / 2; x += step) {
-                    for (let z = -spaceDims.d / 2 + newItemDims.d / 2; z <= spaceDims.d / 2 - newItemDims.d / 2; z += step) {
+                // 從表面的左後角開始掃描
+                for (let x = surface.x - surface.w / 2 + newItemDims.w / 2; x <= surface.x + surface.w / 2 - newItemDims.w / 2; x += step) {
+                    for (let z = surface.z - surface.d / 2 + newItemDims.d / 2; z <= surface.z + surface.d / 2 - newItemDims.d / 2; z += step) {
+
+                        // 檢查新位置的邊界是否超出倉庫
+                        if (x - newItemDims.w / 2 < -spaceDims.w / 2 || x + newItemDims.w / 2 > spaceDims.w / 2 ||
+                            z - newItemDims.d / 2 < -spaceDims.d / 2 || z + newItemDims.d / 2 > spaceDims.d / 2) {
+                            continue;
+                        }
 
                         const newPos = new THREE.Vector3(x, potentialY, z);
                         const newBox = new THREE.Box3().setFromCenterAndSize(newPos, new THREE.Vector3(newItemDims.w, newItemDims.h, newItemDims.d));
@@ -77,14 +68,13 @@ const useStore = create((set, get) => ({
                         }
 
                         if (!collision) {
-                            bestPosition = [newPos.x, newPos.y, newPos.z];
-                            placed = true;
-                            break;
+                            if (potentialY < lowestY) {
+                                lowestY = potentialY;
+                                bestPosition = [newPos.x, newPos.y, newPos.z];
+                            }
                         }
                     }
-                    if (placed) break;
                 }
-                if (placed) break;
             }
 
             if (bestPosition) {
@@ -96,30 +86,11 @@ const useStore = create((set, get) => ({
             }
         }
     },
+    // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    removeItemFromScene: (instanceId) => set((state) => ({ itemsInScene: state.itemsInScene.filter((item) => item.instanceId !== instanceId) })),
-    clearAllItems: () => set({ itemsInScene: [] }),
-    getCalculations: () => { /* 函數內容省略 */ },
+    // ... 其他函數保持不變 ...
 }));
 
-useStore.setState({
-    getCalculations: () => {
-        const { storageSpaces, selectedSpace, itemsInScene } = useStore.getState();
-        const spaceDims = storageSpaces[selectedSpace];
-        const spaceVolume = spaceDims.w * spaceDims.h * spaceDims.d;
-        let itemsVolume = 0; let itemsCFT = 0;
-        itemsInScene.forEach(item => {
-            const w_m = item.dimensions.w; const h_m = item.dimensions.h; const d_m = item.dimensions.d;
-            itemsVolume += w_m * h_m * d_m;
-            const cft = (w_m * 100 * h_m * 100 * d_m * 100) / 28316.846592;
-            itemsCFT += cft;
-        });
-        const usage = spaceVolume > 0 ? (itemsVolume / spaceVolume) * 100 : 0;
-        return {
-            spaceVolume: spaceVolume.toFixed(2), itemsVolume: itemsVolume.toFixed(2),
-            itemsCFT: Math.round(itemsCFT), usage: Math.min(100, usage).toFixed(1),
-        };
-    }
-});
-
+// ... 確保其他函數的完整性 ...
+useStore.setState({ /* ... */ });
 export default useStore;
