@@ -7,31 +7,31 @@ import useStore from '../store/useStore';
 import { useRef } from 'react';
 
 export default function Scene() {
-  const itemsInScene = useStore((state) => state.itemsInScene);
-  const orbitControlsRef = useRef();
+    const itemsInScene = useStore((state) => state.itemsInScene);
+    const orbitControlsRef = useRef();
 
-  return (
-    <Canvas camera={{ position: [8, 8, 8], fov: 50 }} shadows>
-      <ambientLight intensity={0.7} />
-      <directionalLight position={[5, 10, 7.5]} intensity={1.0} castShadow />
-      <OrbitControls ref={orbitControlsRef} makeDefault />
-      <Grid infiniteGrid={true} fadeDistance={50} fadeStrength={5} />
-      <Physics gravity={[0, -9.8, 0]}>
-        <RigidBody type="fixed" colliders="cuboid">
-          <mesh position={[0, -0.05, 0]} userData={{ isGround: true }}>
-            <boxGeometry args={[200, 0.1, 200]} />
-            <meshStandardMaterial transparent opacity={0} />
-          </mesh>
-        </RigidBody>
-        <StorageSpace />
-        {itemsInScene.map((item) => (
-          <DraggableItem 
-            key={item.instanceId} 
-            item={item} 
-            orbitControlsRef={orbitControlsRef}
-          />
-        ))}
-      </Physics>
-    </Canvas>
-  );
+    return (
+        <Canvas camera={{ position: [8, 8, 8], fov: 50 }} shadows>
+            <ambientLight intensity={0.7} />
+            <directionalLight position={[5, 10, 7.5]} intensity={1.0} castShadow />
+            <OrbitControls ref={orbitControlsRef} makeDefault />
+            <Grid infiniteGrid={true} fadeDistance={50} fadeStrength={5} />
+            <Physics gravity={[0, -9.8, 0]}>
+                <RigidBody type="fixed" colliders="cuboid">
+                    <mesh position={[0, -0.05, 0]} userData={{ isGround: true }}>
+                        <boxGeometry args={[200, 0.1, 200]} />
+                        <meshStandardMaterial transparent opacity={0} />
+                    </mesh>
+                </RigidBody>
+                <StorageSpace />
+                {itemsInScene.map((item) => (
+                    <DraggableItem
+                        key={item.instanceId}
+                        item={item}
+                        orbitControlsRef={orbitControlsRef}
+                    />
+                ))}
+            </Physics>
+        </Canvas>
+    );
 }
